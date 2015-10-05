@@ -87,7 +87,7 @@ function syncSidebar() {
   theaters.eachLayer(function (layer) {
     if (map.hasLayer(theaterLayer)) {
       if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.Adres + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
     }
   });
@@ -95,7 +95,7 @@ function syncSidebar() {
   museums.eachLayer(function (layer) {
     if (map.hasLayer(museumLayer)) {
       if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.Adres + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
     }
   });
@@ -103,7 +103,7 @@ function syncSidebar() {
   featureList = new List("features", {
     valueNames: ["feature-name"]
   });
-  featureList.sort("feature-name", {
+  featureList.sort("feature-Adres", {
     order: "asc"
   });
 }
@@ -131,24 +131,49 @@ var mapquestHYB = L.layerGroup([L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sa
 /* Overlay Layers */
 var highlight = L.geoJson(null);
 var highlightStyle = {
-  stroke: false,
+  stroke: true,
   fillColor: "#00FFFF",
-  fillOpacity: 0.7,
-  radius: 10
+  fillOpacity: 0.5,
+  radius: 13
 };
-
 var boroughs = L.geoJson(null, {
   style: function (feature) {
+	if (feature.properties.OBG === "Niet")
+    return {
+      color: "purple",
+	  weight: 1,
+      fill: true,
+      opacity: 5,
+      clickable: true
+    };
+	if (feature.properties.OBG === "Saneringslocatie")
     return {
       color: "black",
-      fill: false,
-      opacity: 1,
+	  weight: 1,
+      fill: true,
+      opacity: 5,
+      clickable: false
+    };
+	if (feature.properties.OBG === "Industrie")
+    return {
+      color: "red",
+	  weight: 1,
+      fill: true,
+      opacity: 5,
+      clickable: true
+    };
+	if (feature.properties.OBG === "Wonen")
+    return {
+      color: "orange",
+	  weight: 1,
+      fill: true,
+      opacity: 5,
       clickable: false
     };
   },
   onEachFeature: function (feature, layer) {
     boroughSearch.push({
-      name: layer.feature.properties.BoroName,
+      name: layer.feature.properties.BG_ONTGRAV,
       source: "Boroughs",
       id: L.stamp(layer),
       bounds: layer.getBounds()
@@ -276,7 +301,7 @@ $.getJSON("data/subways.geojson", function (data) {
 /* Single marker cluster layer to hold all clusters */
 var markerClusters = new L.MarkerClusterGroup({
   spiderfyOnMaxZoom: true,
-  showCoverageOnHover: false,
+  showCoverageOnHover: true,
   zoomToBoundsOnClick: true,
   disableClusteringAtZoom: 16
 });
@@ -298,7 +323,7 @@ var theaters = L.geoJson(null, {
   },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADDRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Aannemer</th><td>" + feature.properties.Aannemer + "</td></tr>" + "<tr><th>Adres</th><td>" + feature.properties.Adres + "</td></tr>" + "<tr><th>Start datum</th><td>" + feature.properties.Startdatu + "</td></tr>" + "<tr><th>leeg</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
       layer.on({
         click: function (e) {
           $("#feature-title").html(feature.properties.NAME);
@@ -309,8 +334,8 @@ var theaters = L.geoJson(null, {
       });
       $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       theaterSearch.push({
-        name: layer.feature.properties.NAME,
-        address: layer.feature.properties.ADDRESS1,
+        name: layer.feature.properties.Adres,
+        address: layer.feature.properties.Adres,
         source: "Theaters",
         id: L.stamp(layer),
         lat: layer.feature.geometry.coordinates[1],
@@ -335,13 +360,13 @@ var museums = L.geoJson(null, {
         iconAnchor: [12, 28],
         popupAnchor: [0, -25]
       }),
-      title: feature.properties.NAME,
+      title: feature.properties.Adres,
       riseOnHover: true
     });
   },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Aannemer</th><td>" + feature.properties.Aannemer + "</td></tr>" + "<tr><th>Adres</th><td>" + feature.properties.Adres + "</td></tr>" + "<tr><th>Start datum</th><td>" + feature.properties.Startdatu + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
       layer.on({
         click: function (e) {
           $("#feature-title").html(feature.properties.NAME);
@@ -352,8 +377,8 @@ var museums = L.geoJson(null, {
       });
       $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       museumSearch.push({
-        name: layer.feature.properties.NAME,
-        address: layer.feature.properties.ADRESS1,
+        name: layer.feature.properties.Adres,
+        address: layer.feature.properties.Adres,
         source: "Museums",
         id: L.stamp(layer),
         lat: layer.feature.geometry.coordinates[1],
@@ -368,7 +393,7 @@ $.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
 
 map = L.map("map", {
   zoom: 10,
-  center: [40.702222, -73.979378],
+  center: [52.341003, 4.822483],
   layers: [mapquestOSM, boroughs, markerClusters, highlight],
   zoomControl: false,
   attributionControl: false
@@ -472,19 +497,19 @@ if (document.body.clientWidth <= 767) {
 }
 
 var baseLayers = {
-  "Street Map": mapquestOSM,
-  "Aerial Imagery": mapquestOAM,
-  "Imagery with Streets": mapquestHYB
+  "Kaart": mapquestOSM,
+  "Satelliet": mapquestOAM,
+  "Satelliet met straten": mapquestHYB
 };
 
 var groupedOverlays = {
-  "Points of Interest": {
-    "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
-    "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
+  "IGH gegevens": {
+    "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Moormeldingen": theaterLayer,
+    "<img src='assets/img/museum.png' width='24' height='28'>&nbsp; 10m3meldingen": museumLayer
   },
   "Reference": {
-    "Boroughs": boroughs,
-    "Subway Lines": subwayLines
+    "Bodemkwaliteitskaart": boroughs,
+    "ophooglaag": subwayLines
   }
 };
 
